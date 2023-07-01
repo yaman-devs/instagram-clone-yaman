@@ -3,7 +3,7 @@ import { data } from "autoprefixer";
 import { format } from "date-fns";
 import { addDoc, collection } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useUploadFile } from "react-firebase-hooks/storage";
 
@@ -16,38 +16,43 @@ export const UploadFile = () => {
   const [selectedFile, setSelectedFile] = useState<File>();
   const refs = ref(storage, "images/" + selectedFile?.name);
 
+  useEffect(() => {
+    upload();
+    setSelectedFile(undefined);
+  }, [selectedFile]);
   const upload = async () => {
     if (selectedFile) {
-      const result = await uploadFile(refs, selectedFile);
+      await uploadFile(refs, selectedFile);
       getDownloadURL(refs).then((url) => {
         addDoc(collection(db, "posts"), {
           userId: user?.displayName || "anonymous",
           imageUrl: url,
+          likes: 0,
           addDate: format(new Date(), "MM/dd/yyyy hh:mm:ss"),
         }).then((ref) => {
-          addDoc(collection(ref, "comments"), {
-            userId: user?.displayName || "guest",
-          });
+          setSelectedFile(undefined);
         });
       });
     }
   };
 
   return (
-    <div>
-      <p>
-        {uploading && <span>Uploading file...</span>}
-
-        {selectedFile && <span>Selected file: {selectedFile.name}</span>}
-        <input
-          type="file"
-          onChange={(e) => {
-            const file = e.target.files ? e.target.files[0] : undefined;
-            setSelectedFile(file);
-          }}
-        />
-        <button onClick={upload}>Upload file</button>
-      </p>
+    <div className="flex justify-center">
+      <input
+        id="file"
+        className="hidden"
+        type="file"
+        onChange={(e) => {
+          const file = e.target.files ? e.target.files[0] : undefined;
+          setSelectedFile(file);
+        }}
+      />
+      <label
+        htmlFor="file"
+        className="cursor-pointer bg-blue-500 px-4 py-2 text-white rounded-lg self-center text-xs"
+      >
+        Upload
+      </label>
     </div>
   );
 };

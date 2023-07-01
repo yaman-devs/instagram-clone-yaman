@@ -19,23 +19,27 @@ export default function Posts() {
     <div>
       <p>
         {postsError && <strong>Error: {JSON.stringify(postsError)}</strong>}
-        {postsLoading && <span>Collection: Loading...</span>}
+        {postsLoading && <span>Loading...</span>}
         {posts && (
-          <ul>
-            Collection:{" "}
+          <ul className="flex flex-col gap-4">
+            {" "}
             {posts?.docs
               .sort((a, b) => (a.data().addDate > b.data().addDate ? -1 : 1))
               .map((doc) => (
                 <postsContext.Provider value={doc.id}>
-                  <li key={doc.id}>
+                  <li className="border flex flex-col w-[500px]" key={doc.id}>
+                    <div className="w-full p-2 border-b-2 ">
+                      {doc.get("userId")}
+                    </div>
                     <Image
+                      className="self-center"
                       src={doc.get("imageUrl")}
                       alt=""
                       width={400}
                       height={400}
                     />
+                    <Comments />
                   </li>
-                  <Comments />
                 </postsContext.Provider>
               ))}
           </ul>

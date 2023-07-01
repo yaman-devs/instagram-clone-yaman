@@ -3,6 +3,9 @@ import { StyledFirebaseAuth } from "react-firebaseui";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
 import firebase from "@/firebase";
+import Image from "next/image";
+import logo from "@/public/instagram-logo.png";
+import { log } from "console";
 
 export default function Auth() {
   const uiConfig = {
@@ -19,6 +22,14 @@ export default function Auth() {
   };
 
   return (
-    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+    <div className="h-full">
+      <div className="flex flex-col justify-center items-center p-8 gap-8 border ">
+        <Image src={logo} alt="logo" width={206} height={58} />
+        <StyledFirebaseAuth
+          uiConfig={uiConfig}
+          firebaseAuth={firebase.auth()}
+        />
+      </div>
+    </div>
   );
 }
